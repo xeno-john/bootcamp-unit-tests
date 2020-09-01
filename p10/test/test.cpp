@@ -2,6 +2,9 @@
 #include<iostream>
 #include "stubs.c"
 
+#define RETURN_ERROR 1
+#define RETURN_OK 0
+
 using namespace std;
 
 /* compile with g++ test.cpp -lgtest -lgtest_main -pthread -fpermissive -std=c++11 */
@@ -42,6 +45,41 @@ class MyTestFixture : public testing::Test
         *temp = 0;
 	}
 
+    void set_pthread_create_RET(int new_test_value)
+    {
+        pthread_create_RET = new_test_value;
+    }
+    
+    void set_pthread_join_RET(int new_test_value)
+    {
+        pthread_join_RET = new_test_value;
+    }
+
+    void set_pthread_mutex_lock_RET(int new_test_value)
+    {
+        pthread_mutex_lock_RET = new_test_value;
+    }
+
+    void set_pthread_mutex_unlock_RET(int new_test_value)
+    {
+        pthread_mutex_unlock_RET = new_test_value;
+    }
+
+    void set_pthread_cond_broadcast_RET(int new_test_value)
+    {
+        pthread_cond_broadcast_RET = new_test_value;
+    }
+
+    void set_pthread_cond_destroy_RET(int new_test_value)
+    {
+        pthread_cond_destroy_RET = new_test_value;
+    }
+
+    void set_pthread_mutex_destroy_RET(int new_test_value)
+    {
+        pthread_mutex_destroy_RET = new_test_value;
+    }
+
 	void SetUp ()
 	{
 		/* Code here will execute just before the test ensues */
@@ -62,62 +100,62 @@ class MyTestFixture : public testing::Test
 
 TEST_F(MyTestFixture,ThreadsFail)
 {
-    pthread_create_RET = 1;
-    pthread_join_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_create_RET(RETURN_ERROR);
+    set_pthread_join_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadCreateFails)
 {
-    pthread_create_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_create_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadMutexLockFails)
 {
-    pthread_mutex_lock_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_mutex_lock_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadMutexUnlockFails)
 {
-    pthread_mutex_unlock_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_mutex_unlock_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadJoinFails)
 {
-    pthread_join_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_join_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadCondBroadcastFails)
 {
-    pthread_cond_broadcast_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_cond_broadcast_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadCondDestroyFails)
 {
-    pthread_cond_destroy_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_cond_destroy_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadMutexDestroyFails)
 {
-    pthread_mutex_destroy_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_pthread_mutex_destroy_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadMutexLockFailsOnTask)
 {
-    pthread_mutex_lock_RET = 1;
+    set_pthread_mutex_lock_RET(RETURN_ERROR);
     ASSERT_EQ(NULL,task((void*)temp));
 }
 
 TEST_F(MyTestFixture,PthreadMutexUnlockFailsOnTask)
 {
-    pthread_mutex_unlock_RET = 1;
+    set_pthread_mutex_unlock_RET(RETURN_ERROR);
     ASSERT_EQ(NULL,task((void*)temp));
 }
 

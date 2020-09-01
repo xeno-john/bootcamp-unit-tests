@@ -24,10 +24,6 @@ void *task(void *arg)
             DBG_PRINT(5,"Thread %li doing stuff.\n",tid);
             rc = pthread_cond_wait(&cond,&mutex);
             
-            if (0 != rc)
-            {
-                return NULL;
-            }
         }
 
         rc = pthread_mutex_unlock(&mutex);
