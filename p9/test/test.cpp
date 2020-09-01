@@ -4,6 +4,9 @@
 
 using namespace std;
 
+#define RETURN_ERROR 1
+#define RETURN_OK 0
+
 /* compile with g++ test.cpp -lgtest -lgtest_main -pthread -fpermissive -std=c++11 */
 
 /* 
@@ -27,19 +30,44 @@ class MyTestFixture : public testing::Test
 {
 	/* Put any custom data members that you need */
     protected:
-    double *dummy = new double;
-    double *temp = new double;
+    double *dummy = new double; /* used to return allocated zone in memory for malloc stub */
+    double *temp = new double; /* used to provide an adress to some value when testing the 'task' function */
 
 	MyTestFixture ()
 	{
 		/* Initialization code here */
-        pthread_create_RET = 0;
-        pthread_join_RET = 0;
-        pthread_mutex_lock_RET = 0;
-        pthread_mutex_unlock_RET = 0;
+        pthread_create_RET = RETURN_OK;
+        pthread_join_RET = RETURN_OK;
+        pthread_mutex_lock_RET = RETURN_OK;
+        pthread_mutex_unlock_RET = RETURN_OK;
         malloc_RET = NULL;
         *temp = 0;
 	}
+
+    void set_pthread_create_RET(int new_test_value)
+    {
+        pthread_create_RET = new_test_value;
+    }
+    
+    void set_pthread_join_RET(int new_test_value)
+    {
+        pthread_join_RET = new_test_value;
+    }
+
+    void set_pthread_mutex_lock_RET(int new_test_value)
+    {
+        pthread_mutex_lock_RET = new_test_value;
+    }
+
+    void set_pthread_mutex_unlock_RET(int new_test_value)
+    {
+        pthread_mutex_unlock_RET = new_test_value;
+    }
+
+    void set_malloc_RET(void* new_test_value)
+    {
+        malloc_RET = new_test_value;
+    }
 
 	void SetUp ()
 	{
@@ -58,48 +86,49 @@ class MyTestFixture : public testing::Test
 	}
 };
 
+
 TEST_F(MyTestFixture,AllocationFailure)
 {
-    ASSERT_NE(0,handle_threads());
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,AllOK)
 {
-    malloc_RET = dummy;
-    ASSERT_EQ(0,handle_threads());
+    set_malloc_RET(dummy);
+    ASSERT_EQ(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,ThreadsFail)
 {
-    malloc_RET = dummy;
-    pthread_create_RET = 1;
-    pthread_join_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_malloc_RET(dummy);
+    set_pthread_create_RET(RETURN_ERROR);
+    set_pthread_join_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadCreateFails)
 {
-    malloc_RET = dummy;
-    pthread_create_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_malloc_RET(dummy);
+    set_pthread_create_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadJoinFails)
 {
-    malloc_RET = dummy;
-    pthread_join_RET = 1;
-    ASSERT_NE(0,handle_threads());
+    set_malloc_RET(dummy);
+    set_pthread_join_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadMutexLockFails)
 {
-    pthread_mutex_lock_RET = 1;
+    set_pthread_mutex_lock_RET(RETURN_ERROR);
     ASSERT_EQ(NULL,task((void*)temp));
 }
 
 TEST_F(MyTestFixture,PthreadMutexUnlockFails)
 {
-    pthread_mutex_unlock_RET = 1;
+    set_pthread_mutex_unlock_RET(RETURN_ERROR);
     ASSERT_EQ(NULL,task((void*)temp));
 }
 
