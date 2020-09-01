@@ -2,6 +2,9 @@
 #include<iostream>
 #include "stubs.c"
 
+#define RETURN_ERROR 1
+#define RETURN_OK 0
+
 using namespace std;
 
 /* compile with g++ test.cpp -lgtest -lgtest_main -pthread -fpermissive -std=c++11 */
@@ -31,8 +34,18 @@ class MyTestFixture : public testing::Test
 	MyTestFixture ()
 	{
 		/* Initialization code here */
-        pthread_create_RET = 0;
-        pthread_join_RET = 0;
+		set_pthread_join_RET(RETURN_OK);
+		set_pthread_create_RET(RETURN_OK);
+	}
+
+	void set_pthread_create_RET(int new_test_value)
+	{
+		pthread_create_RET = new_test_value; 
+	}
+
+	void set_pthread_join_RET(int new_test_value)
+	{
+		pthread_join_RET = new_test_value;
 	}
 
 	void SetUp ()
@@ -54,28 +67,26 @@ class MyTestFixture : public testing::Test
 
 TEST_F(MyTestFixture,WhenEverythingGoesOK)
 {
-    ASSERT_EQ(0,handle_threads());
+    ASSERT_EQ(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,WhenSomeThreadsFail)
 {
-	pthread_join_RET = 1;
-	pthread_create_RET = 1;
-    ASSERT_NE(0,handle_threads());
+	set_pthread_join_RET(RETURN_ERROR);
+	set_pthread_create_RET(RETURN_ERROR);
+    ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadCreateFails)
 {
-	pthread_create_RET = 1;
-	pthread_join_RET = 0;
-	ASSERT_NE(0,handle_threads());
+	set_pthread_create_RET(RETURN_ERROR);
+	ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,PthreadJoinFails)
 {
-	pthread_create_RET = 0;
-	pthread_join_RET = 1;
-	ASSERT_NE(0,handle_threads());
+	set_pthread_join_RET(RETURN_ERROR);
+	ASSERT_NE(RETURN_OK,handle_threads());
 }
 
 TEST_F(MyTestFixture,TaskFunction)
