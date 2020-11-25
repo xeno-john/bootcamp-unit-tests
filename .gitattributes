@@ -1,0 +1,4 @@
+p1/coverage/* linguist-vendored
+p2/cov_dir/* linguist-vendored
+p3/cov_dir/* linguist-vendored
+p4/cov_dir/* linguist-vendored
