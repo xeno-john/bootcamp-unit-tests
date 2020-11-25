@@ -2,3 +2,5 @@ p1/coverage/* linguist-vendored
 p8/cov_dir/* linguist-vendored
 p9/cov_dir/* linguist-vendored
 p10/cov_dir/* linguist-vendored
+*.html linguist-detectable=false
+*.css linguist-detectable=true
